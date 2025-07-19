@@ -1,19 +1,23 @@
-from utils.data_loader import data_loader
-from PIL import Image, UnidentifiedImageError
 import torch
+import torch.nn.functional as F
 
-train_data_dir = "../Datasets/cats_and_dogs/cats_vs_dogs_split/train"
-test_data_dir = "../Datasets/cats_and_dogs/cats_vs_dogs_split/val"
+def train(model, criterion, optimizer, train_data):
+    correct, total = 0, 0
 
+    for i, (images, labels) in enumerate(train_data):
 
-train_data, val_data = data_loader(train_data_dir, test_data_dir,  2)
+        optimizer.zero_grad()
+        outputs = model(images)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
 
-print(len(train_data))
+        probabilities = F.softmax(outputs, dim=1)
+        predicted_classes = torch.argmax(probabilities, dim=1)
 
+        correct += (predicted_classes == labels).sum().item()
+        total += labels.size(0)
 
-for i, (images, labels) in enumerate(train_data):
-    print(images.shape)
-    #images = images.reshape(images.size(0), -1)
-    print(images)
-    if i == 0:
-        break
+        if i % 10:
+            print(correct / total)
+    return correct / total
