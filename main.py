@@ -22,4 +22,5 @@ optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
 for epoch in range(epochs):
     acc = train(model, criterion, optimizer, train_data)
+    #TODO validate model and draw plots
     print("Accuracy: ", acc)
